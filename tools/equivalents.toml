@@ -1,0 +1,28 @@
+# Reviewed mutants that cannot change behaviour; tools/mutate.py reports them as equivalent.
+# An entry matches a mutant by every field but the reason: the file, the enclosing function or
+# class, the operator, and the first line of the mutated code before and after, as the report prints
+# them (stripped, `\|` there is `|` here). One sentence of reason each.
+#
+# [[equivalent]]
+# file = "src/spartorch/x.py"
+# scope = "f"
+# operator = "compare"
+# original = "if n >= 0:"
+# mutant = "if (n > -1):"
+# reason = "n is an int, so n >= 0 and n > -1 are the same test."
+
+[[equivalent]]
+file = "src/spartorch/modules/_weight.py"
+scope = "SparseWeight"
+operator = "delete"
+original = "index: Tensor"
+mutant = "pass"
+reason = "A declaration for the type checker, which otherwise sees the buffer as nn.Module's untyped __getattr__; register_buffer makes the attribute at run time."
+
+[[equivalent]]
+file = "src/spartorch/functional/ops/_csr.py"
+scope = "sddmm"
+operator = "constant"
+original = "torch.sparse.sampled_addmm(pattern, g.t().contiguous(), x.t().contiguous().t(), beta=0.0, out=pattern)"
+mutant = "torch.sparse.sampled_addmm(pattern, g.t().contiguous(), x.t().contiguous().t(), beta=1.0, out=pattern)"
+reason = "beta multiplies the values of pattern, which are the zeros new_zeros just made, so either beta adds 0; 0.0 is the old op's, kept so the kernel need not read them."

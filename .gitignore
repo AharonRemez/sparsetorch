@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Compiled CUDA/C++ extensions
+*.so
+*.o
+
+# Environments
+.venv/
+
+# Tools
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Datasets and run logs
+data/
+runs/
+
+# Sphinx autosummary stubs (doc/build is covered by build/ above)
+doc/source/generated/
+
+# The report tools/mutate.py writes
+evidence/

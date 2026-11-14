@@ -1,0 +1,82 @@
+[project]
+name = "spartorch"
+version = "0.1.0"
+description = "Truly sparse layers for PyTorch: a weight is its connections, on the GPU"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.13"
+dependencies = [
+    "torch>=2.15.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+default-groups = ["dev", "doc"]  # the tests build the docs, so one environment has both
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["cuda: needs a CUDA device; skipped when none is available"]
+
+[[tool.uv.index]]
+name = "pytorch-cu134"
+url = "https://download.pytorch.org/whl/cu134"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu134" }
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.414",
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]
+doc = [
+    "myst-parser>=5.2.0",
+    "pydata-sphinx-theme>=0.24.0",
+    "sphinx>=9.2.0",
+    "sphinx-autodoc-typehints>=3.17.5",
+    "sphinx-copybutton>=0.5.2",
+    "sphinxext-opengraph>=0.13.0",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "UP", "B", "D", "PT", "RUF",
+    "E301", "E302", "E305",
+    "C4", "SIM", "N", "ISC", "PGH", "TID252", "TRY004", "FBT001", "FBT002", "ANN", "T20",
+]
+# The blank-line rules are still preview rules in ruff: 2 blank lines around every top-level
+# function and class (E302, E305), 1 before a method (E301). Only the preview rules named in
+# select are switched on, not every preview rule of the selected families.
+preview = true
+explicit-preview-rules = true
+ignore = [
+    "D105", "D107",  # magic methods and __init__: the class docstring covers them
+    "N812",  # `import torch.nn.functional as F` is the torch convention
+]
+allowed-confusables = ["–"]  # the en dash in names such as Erdős–Rényi is the right character
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true  # an __init__ with typed arguments needs no "-> None"
+
+[tool.ruff.lint.per-file-ignores]
+# Docstrings, annotations and the print ban are for the library; tests and scripts are not API.
+"{tests,examples,benchmarks,tools,doc}/**" = ["D", "ANN", "T20"]
+
+[tool.pyright]
+# The whole repo, in standard mode. Setting exclude drops pyright's default excludes, so "**/.*" (.venv) is restated.
+exclude = ["**/.*"]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
